@@ -12,6 +12,10 @@ This package gives app developers a typed, async/await API for:
 - Push registration
 - Background sync (`connectBackground`)
 
+## Detailed Docs
+
+For full developer documentation, see `docs/README.md`.
+
 ## Platform + Swift Requirements
 
 - Swift tools: `5.9+`
@@ -25,17 +29,17 @@ This package gives app developers a typed, async/await API for:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/<your-org>/swift-gmessages.git", from: "0.1.0")
+  .package(url: "https://github.com/mweinbach/swift-gmessages.git", from: "0.1.0")
 ],
 targets: [
   .target(
     name: "YourApp",
-    dependencies: ["LibGM"]
+    dependencies: [
+      .product(name: "LibGM", package: "swift-gmessages")
+    ]
   )
 ]
 ```
-
-Replace the package URL/version with your actual source.
 
 ## Core Concepts
 
@@ -308,4 +312,3 @@ try await client.saveAuthData(to: store)
 - Reconnect strategy:
   - treat `listenTemporaryError` as transient
   - treat `listenFatalError` as session-invalidating, then re-auth/re-pair as needed
-
