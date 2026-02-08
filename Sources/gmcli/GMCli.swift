@@ -28,8 +28,13 @@ struct GMCli: AsyncParsableCommand {
 
 /// Default auth data store location
 func defaultStore() -> AuthDataStore {
-    let homeDir = FileManager.default.homeDirectoryForCurrentUser
-    let gmcliDir = homeDir.appendingPathComponent(".gmcli", isDirectory: true)
+    #if os(macOS)
+    let baseDir = FileManager.default.homeDirectoryForCurrentUser
+    #else
+    let baseDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+        ?? FileManager.default.temporaryDirectory
+    #endif
+    let gmcliDir = baseDir.appendingPathComponent(".gmcli", isDirectory: true)
     return AuthDataStore(directoryURL: gmcliDir)
 }
 

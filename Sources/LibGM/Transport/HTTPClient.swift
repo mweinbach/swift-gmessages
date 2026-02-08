@@ -41,14 +41,30 @@ public actor GMHTTPClient {
         config.timeoutIntervalForResource = 300
 
         if let proxy = proxyURL {
+            let host = proxy.host ?? ""
+            let port = proxy.port ?? 8080
+
+            #if os(macOS)
             config.connectionProxyDictionary = [
                 kCFNetworkProxiesHTTPEnable: true,
-                kCFNetworkProxiesHTTPProxy: proxy.host ?? "",
-                kCFNetworkProxiesHTTPPort: proxy.port ?? 8080,
+                kCFNetworkProxiesHTTPProxy: host,
+                kCFNetworkProxiesHTTPPort: port,
                 kCFNetworkProxiesHTTPSEnable: true,
-                kCFNetworkProxiesHTTPSProxy: proxy.host ?? "",
-                kCFNetworkProxiesHTTPSPort: proxy.port ?? 8080,
+                kCFNetworkProxiesHTTPSProxy: host,
+                kCFNetworkProxiesHTTPSPort: port,
             ]
+            #else
+            // CFNetwork proxy constants are unavailable on some Apple SDKs (for example watchOS),
+            // but URLSession still accepts these string-based dictionary keys.
+            config.connectionProxyDictionary = [
+                "HTTPEnable": 1,
+                "HTTPProxy": host,
+                "HTTPPort": port,
+                "HTTPSEnable": 1,
+                "HTTPSProxy": host,
+                "HTTPSPort": port,
+            ]
+            #endif
         }
 
         return URLSession(configuration: config)
